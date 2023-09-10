@@ -1,27 +1,36 @@
 import axios from "axios";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ProductForm({
   _id,
   title: existingTitle,
+  category: existingCategory,
   description: existingDescription,
   price: existingPrice,
   images,
 }) {
   const [title, setTitle] = useState(existingTitle || "");
+  const [category, setCateogry] = useState(existingCategory || "");
   const [description, setDescription] = useState(existingDescription || "");
   const [price, setPrice] = useState(existingPrice || "");
+  const [categories, setCategories] = useState([]);
   const [goToProducts, setGoToProducts] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    axios.get("/api/categories").then((res) => {
+      setCategories(res.data);
+    });
+  }, []);
+
   async function saveProduct(e) {
     e.preventDefault();
-    const data = { title, description, price };
+    const data = { title, description, price, category };
 
     if (_id) {
       // update product
-      await axios.post("/api/products", { _id, ...data });
+      await axios.put("/api/products", { _id, ...data });
     } else {
       // create product
       await axios.post("/api/products", data);
@@ -59,6 +68,16 @@ export default function ProductForm({
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
+      <label>Category</label>
+      <select value={category} onChange={(e) => setCateogry(e.target.value)}>
+        <option value="">Uncategorized</option>
+        {categories.length > 0 &&
+          categories.map((category) => (
+            <option key={category._id} value={category._id}>
+              {category.name}
+            </option>
+          ))}
+      </select>
       <label>Photos</label>
       <div className="mb-2">
         <label className="w-24 h-24 flex flex-col justify-center items-center text-center text-sm gap-1 text-gray-500 rounded-lg bg-gray-200 cursor-pointer">
