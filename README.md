@@ -109,7 +109,7 @@ export default function App({
     ```
 
   - lib/mongodb.js 파일 생성  
-    매 실행시마다 mongoClient를 새로 생성하는 대신 기존 mongoClient를 사용
+    매 실행시마다 mongoClient를 새로 생성하지 않고 기존 mongoClient를 사용
 
   - adapter 설정
 
