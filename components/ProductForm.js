@@ -8,10 +8,11 @@ export default function ProductForm({
   category: existingCategory,
   description: existingDescription,
   price: existingPrice,
-  images,
+  images: existingImages,
 }) {
   const [title, setTitle] = useState(existingTitle || "");
   const [category, setCateogry] = useState(existingCategory || "");
+  const [images, setImages] = useState(existingImages || []);
   const [description, setDescription] = useState(existingDescription || "");
   const [price, setPrice] = useState(existingPrice || "");
   const [categories, setCategories] = useState([]);
@@ -26,7 +27,7 @@ export default function ProductForm({
 
   async function saveProduct(e) {
     e.preventDefault();
-    const data = { title, description, price, category };
+    const data = { title, description, price, category, images };
 
     if (_id) {
       // update product
@@ -48,13 +49,19 @@ export default function ProductForm({
 
     if (files?.length > 0) {
       const data = new FormData();
+
       for (const file of files) {
         data.append("file", file);
       }
+
       const res = await axios.post("/api/upload", data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+      });
+
+      setImages((oldImages) => {
+        return [...oldImages, ...res.data.links];
       });
     }
   }
@@ -79,7 +86,13 @@ export default function ProductForm({
           ))}
       </select>
       <label>Photos</label>
-      <div className="mb-2">
+      <div className="mb-2 flex flex-wrap gap-2">
+        {!!images?.length > 0 &&
+          images.map((link) => (
+            <div key={link} className="h-24">
+              <img src={link} alt="" className="rounded-lg" />
+            </div>
+          ))}
         <label className="w-24 h-24 flex flex-col justify-center items-center text-center text-sm gap-1 text-gray-500 rounded-lg bg-gray-200 cursor-pointer">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -98,7 +111,6 @@ export default function ProductForm({
           <div> Upload</div>
           <input type="file" className="hidden" onChange={uploadImage} />
         </label>
-        {!images?.length && <div>No photos in this product</div>}
       </div>
       <label>Description</label>
       <textarea
