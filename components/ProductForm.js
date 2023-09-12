@@ -109,7 +109,12 @@ export default function ProductForm({
             />
           </svg>
           <div> Upload</div>
-          <input type="file" className="hidden" onChange={uploadImage} />
+          <input
+            type="file"
+            multiple
+            className="hidden"
+            onChange={uploadImage}
+          />
         </label>
       </div>
       <label>Description</label>
